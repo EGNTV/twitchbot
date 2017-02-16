@@ -12,7 +12,8 @@ def chat(sock, msg):
     sock -- the socket over which to send the message
     msg  -- the message to be sent
     """
-    bytes = sock.send("WHO {} :{}".format(cfg.CHAN, msg).encode("utf-8"))
+    print("COMMAND: "+"PRIVMSG {} {}".format(cfg.CHAN, msg))
+    bytes = sock.send("PRIVMSG {} {}".format(cfg.CHAN, msg).encode("utf-8"))
     print(bytes)
 
 def ban(sock, user):
@@ -53,6 +54,5 @@ while True:
         username = re.search(r"\w+", response).group(0) # return the entire match
         message = CHAT_MSG.sub("", response).rstrip()
         if("!score" == message):
-            print('Yes')
             chat(s,"Message du IRC")
     time.sleep(1 / cfg.RATE)
