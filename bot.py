@@ -13,7 +13,7 @@ def chat(sock, msg):
     msg  -- the message to be sent
     """
     print("COMMAND: "+"PRIVMSG {} {}".format(cfg.CHAN, msg))
-    bytes = sock.send("PRIVMSG {} {}".format(cfg.CHAN, msg).encode("utf-8"))
+    bytes = sock.send("PRIVMSG {} {}\r\n".format(cfg.CHAN, msg).encode("utf-8"))
     print(bytes)
 
 def ban(sock, user):
@@ -40,6 +40,7 @@ def timeout(sock, user, secs=600):
 s = socket.socket()
 s.connect((cfg.HOST, cfg.PORT))
 s.send("PASS {}\r\n".format(cfg.PASS).encode("utf-8"))
+s.send("USER {} 0 * :{}\r\n".format(cfg.NICK,cfg.NICK).encode("utf-8"))
 s.send("NICK {}\r\n".format(cfg.NICK).encode("utf-8"))
 s.send("JOIN {}\r\n".format(cfg.CHAN).encode("utf-8"))
 
