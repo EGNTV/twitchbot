@@ -13,7 +13,7 @@ def chat(sock, msg):
     msg  -- the message to be sent
     """
     bytes = sock.send("WHO {} :{}".format(cfg.CHAN, msg).encode("utf-8"))
-    print(bytes);
+    print(bytes)
 
 def ban(sock, user):
     """
@@ -51,9 +51,8 @@ while True:
         s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
     else:
         username = re.search(r"\w+", response).group(0) # return the entire match
-        message = CHAT_MSG.sub("", response)
-        print(username + ": " + message)
-        #if(message == "!score"):
-        print('Yes')
-        chat(s,"Message du IRC")
+        message = CHAT_MSG.sub("", response).rstrip()
+        if("!score" == message):
+            print('Yes')
+            chat(s,"Message du IRC")
     time.sleep(1 / cfg.RATE)
