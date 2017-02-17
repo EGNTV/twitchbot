@@ -1,48 +1,18 @@
 # bot.py
 import cfg
-import socket
 import re
 import time
-
-
-def chat(sock, msg):
-    """
-    Send a chat message to the server.
-    Keyword arguments:
-    sock -- the socket over which to send the message
-    msg  -- the message to be sent
-    """
-    print("COMMAND: "+"PRIVMSG {} {}".format(cfg.CHAN, msg))
-    bytes = sock.send("PRIVMSG {} {}\r\n".format(cfg.CHAN, msg).encode("utf-8"))
-    print(bytes)
-
-def ban(sock, user):
-    """
-    Ban a user from the current channel.
-    Keyword arguments:
-    sock -- the socket over which to send the ban command
-    user -- the user to be banned
-    """
-    chat(sock, ".ban {}".format(user))
-
-def timeout(sock, user, secs=600):
-    """
-    Time out a user for a set period of time.
-    Keyword arguments:
-    sock -- the socket over which to send the timeout command
-    user -- the user to be timed out
-    secs -- the length of the timeout in seconds (default 600)
-    """
-    chat(sock, ".timeout {}".format(user, secs))
+from Connection import Connection
+from Commands.CommandFactory import CommandFactory
+from Commands.abstract.MessageCommand import MessageCommand
 
 
 
-s = socket.socket()
-s.connect((cfg.HOST, cfg.PORT))
-s.send("PASS {}\r\n".format(cfg.PASS).encode("utf-8"))
-s.send("USER {} 0 * :{}\r\n".format(cfg.NICK,cfg.NICK).encode("utf-8"))
-s.send("NICK {}\r\n".format(cfg.NICK).encode("utf-8"))
-s.send("JOIN {}\r\n".format(cfg.CHAN).encode("utf-8"))
+
+
+
+con = Connection(cfg.HOST, cfg.PORT,cfg.PASS,cfg.NICK,cfg.CHAN)
+s = con.connect()
 
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
@@ -54,6 +24,9 @@ while True:
     else:
         username = re.search(r"\w+", response).group(0) # return the entire match
         message = CHAT_MSG.sub("", response).rstrip()
-        if("!score" == message):
-            chat(s,"Message du IRC")
+        command = CommandFactory.create(message)
+
+        if(command and isinstance(command, MessageCommand)):
+            con.chat(command.getMessage())
+
     time.sleep(1 / cfg.RATE)

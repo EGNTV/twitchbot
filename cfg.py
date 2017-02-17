@@ -1,5 +1,5 @@
 # cfg.py
-HOST = "irc.chat.twitch.tv"              # the Twitch IRC server
+HOST = "irc.twitch.tv"              # the Twitch IRC server
 PORT = 6667                         # always use port 6667!
 NICK = "snappydue"            # your Twitch username, lowercase
 PASS = "oauth:r3lhfgar9bkp61gqpfqzpgmf88m1a6" # your Twitch OAuth token
