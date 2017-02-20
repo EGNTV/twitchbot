@@ -1,8 +1,9 @@
 
 import abc
+from .Command import Command
 
 
-class MessageCommand(metaclass=abc.ABCMeta):
+class MessageCommand(Command):
     @abc.abstractmethod
-    def getMessage(self):
+    def getMessage(self,username):
         """Return the message to be sent"""

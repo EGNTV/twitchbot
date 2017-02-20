@@ -2,13 +2,9 @@
 import cfg
 import re
 import time
-from Connection import Connection
+from connection import Connection
 from Commands.CommandFactory import CommandFactory
 from Commands.abstract.MessageCommand import MessageCommand
-
-
-
-
 
 
 con = Connection(cfg.HOST, cfg.PORT,cfg.PASS,cfg.NICK,cfg.CHAN)
@@ -24,9 +20,9 @@ while True:
     else:
         username = re.search(r"\w+", response).group(0) # return the entire match
         message = CHAT_MSG.sub("", response).rstrip()
-        command = CommandFactory.create(message)
+        command = CommandFactory.create(message,username)
 
         if(command and isinstance(command, MessageCommand)):
-            con.chat(command.getMessage())
+            con.chat(command.getMessage(username))
 
     time.sleep(1 / cfg.RATE)

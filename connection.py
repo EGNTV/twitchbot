@@ -1,4 +1,7 @@
 import socket
+import urllib.request
+import json
+import cfg
 
 
 class Connection:
@@ -25,6 +28,10 @@ class Connection:
         self.sock.send("USER {} 0 * :{}\r\n".format(self.nickname,self.nickname).encode("utf-8"))
         self.sock.send("NICK {}\r\n".format(self.nickname).encode("utf-8"))
         self.sock.send("JOIN {}\r\n".format(self.channel).encode("utf-8"))
+        self.sock.send("MODE {} +o {}\r\n".format(self.channel, self.nickname).encode("utf-8"))
+        self.chat("🎂 <3 The cake is here! <3 🎂")
+        self.getOP()
+        self.getStream()
         return self.sock
 
     def chat(self, msg):
@@ -35,7 +42,7 @@ class Connection:
         msg  -- the message to be sent
         """
         print("COMMAND: " + "PRIVMSG {} {}".format(self.channel, msg))
-        bytes = self.sock.send("PRIVMSG {} {}\r\n".format(self.channel, msg).encode("utf-8"))
+        bytes = self.sock.send("PRIVMSG {} :{}\r\n".format(self.channel, msg).encode("utf-8"))
         print(bytes)
 
     def ban(self, user):
@@ -45,7 +52,7 @@ class Connection:
         sock -- the socket over which to send the ban command
         user -- the user to be banned
         """
-        self.chat(self.sock, ".ban {}".format(user))
+        self.chat(self.sock, ".ban {}\r\n".format(user).encode("utf-8"))
 
     def timeout(self,sock, user, secs=600):
         """
@@ -55,4 +62,17 @@ class Connection:
         user -- the user to be timed out
         secs -- the length of the timeout in seconds (default 600)
         """
-        self.chat(self.sock, ".timeout {}".format(user, secs))
+        self.chat(self.sock, ".timeout {}\r\n".format(user, secs).encode("utf-8"))
+    def getOP(self):
+        response = urllib.request.urlopen("http://tmi.twitch.tv/group/user/{}/chatters".format(cfg.NICK)).read().decode('utf-8')
+        jsonResponse = json.loads(response)
+
+        cfg.MODS = jsonResponse["chatters"]["moderators"];
+        cfg.STAFF = jsonResponse["chatters"]["staff"]
+        cfg.ADMINS = jsonResponse["chatters"]["admins"]
+        cfg.GLOBAL_MODS = jsonResponse["chatters"]["global_mods"]
+        cfg.VIEWERS = jsonResponse["chatters"]["viewers"]
+
+    def getStream(self):
+        response = urllib.request.urlopen("https://api.twitch.tv/kraken/streams/{}".format(cfg.CHAN_NICK),headers={"Client-ID" : cfg.CLIENT_ID})
+        print(response)
